@@ -1239,14 +1239,14 @@ function UI.setup_keymaps()
   end, "Close list view")
 
   -- Task Movement
-  map("K", function()
+  map("U", function()
     local task = UI.get_task_under_cursor()
     if task then
       Actions.move_task_up(state.tasks, task.id, state.on_task_update)
     end
   end, "Move Task Up")
 
-  map("J", function()
+  map("E", function()
     local task = UI.get_task_under_cursor()
     if task then
       Actions.move_task_down(state.tasks, task.id, state.on_task_update)
@@ -1263,13 +1263,13 @@ function UI.setup_keymaps()
   end, "Toggle Task")
 
   -- Task Management
-  map("d", function()
+  map("<leader>dt", function()
     UI.delete_task()
   end, "Delete Task")
-  map("i", function()
+  map(";", function()
     UI.toggle_task_info()
   end, "Toggle Task Info")
-  map("e", function()
+  map("k", function()
     local task = UI.get_task_under_cursor()
     if task then
       vim.ui.input({
@@ -1289,15 +1289,15 @@ function UI.setup_keymaps()
     UI.cycle_priority()
   end, "Toggle Priority")
 
-  map("n", function()
+  map("M", function()
     UI.add_multi_note()
   end, "add multi note")
 
-  map("N", function()
+  map("D", function()
     UI.delete_note()
   end, "delete note")
 
-  map("D", function()
+  map("s", function()
     UI.set_due_date()
   end, "Set Date")
 
@@ -1386,69 +1386,6 @@ function UI.setup_keymaps()
   map("A", function()
     UI.add_subtask()
   end, "Add SubTask")
-  map("<leader>a", function()
-    vim.ui.input({
-      prompt = "Quick task:",
-    }, function(content)
-      if content and content ~= "" then
-        local task
-
-        -- Use core method with immediate saving if available
-        if state.core and state.core.add_task then
-          task = state.core:add_task(content, {
-            priority = "medium",
-            due_date = nil,
-          })
-        else
-          -- Fallback to old method
-          task = Actions.add_task(state.tasks, content, {
-            priority = "medium",
-            due_date = nil,
-          }, state.on_task_update)
-        end
-
-        if task then
-          UI.refresh()
-          UI.show_feedback("Quick task added")
-        end
-      end
-    end)
-  end, "Quick Add Task")
-
-  map("<leader>A", function()
-    local parent_task = UI.get_task_under_cursor()
-    if not parent_task then
-      UI.show_feedback("No task selected", "warn")
-      return
-    end
-
-    vim.ui.input({
-      prompt = "Subtask content:",
-    }, function(content)
-      if content and content ~= "" then
-        local subtask = Task.new(content, {
-          priority = "medium",
-          parent_id = parent_task.id,
-          due_date = nil,
-        })
-
-        parent_task.subtasks = parent_task.subtasks or {}
-        table.insert(parent_task.subtasks, subtask)
-
-        if state.on_task_update then
-          state.on_task_update(state.tasks)
-        end
-
-        UI.show_feedback(string.format("Added subtask to '%s'", parent_task.content))
-        UI.refresh()
-
-        if parent_task.collapsed then
-          parent_task.collapsed = false
-          UI.refresh()
-        end
-      end
-    end)
-  end, "Quick Add Subtask")
 
   map("z", function()
     UI.toggle_fold()
